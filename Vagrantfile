@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-WORKERS = 1
+WORKERS = 3
 DISKS = 1
 DISKSIZE = "30G"
 
