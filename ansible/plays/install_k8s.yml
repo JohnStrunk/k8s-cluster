@@ -46,3 +46,15 @@
   tasks:
     - name: Join on workers
       command: kubeadm join --skip-preflight-checks --token {{ k8s_init_token }} master:6443
+    - name: wait for node to be ready
+      shell: test "$(kubectl get nodes {{ ansible_hostname }} --no-headers | awk '{ print $2 }')" = "Ready"
+      register: task_result
+      until: task_result.rc == 0
+      delay: 10
+      retries: 60
+      changed_when: false
+
+#- hosts: master
+#  tasks:
+#  - name: Deploy dashboard
+#    command: kubectl create -f https://git.io/kube-dashboard

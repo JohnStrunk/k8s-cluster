@@ -6,7 +6,8 @@ DISKS = 1
 DISKSIZE = "30G"
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "fedora/26-cloud-base"
+  #config.vm.box = "fedora/26-cloud-base"
+  config.vm.box = "centos/7"
   config.vm.provider "libvirt" do |lv|
     lv.cpus = "2"
     lv.memory = "2048"

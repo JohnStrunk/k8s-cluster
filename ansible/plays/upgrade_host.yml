@@ -4,12 +4,14 @@
   become: true
   tasks:
     - name: Upgrade system
-      dnf:
+      yum:
+      #dnf:
         name: "*"
         state: latest
       register: upgrade
     - name: Install selinux-python
-      dnf:
+      yum:
+      #dnf:
         name: libselinux-python
         state: present
     - name: Restart if upgraded

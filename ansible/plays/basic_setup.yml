@@ -9,12 +9,14 @@
         src: ../templates/k8s.repo.j2
         dest: /etc/yum.repos.d/k8s.repo
     - name: Add k8s prereq packages
-      dnf:
+      yum:
+      #dnf:
         state: present
         name: "{{ item }}"
       with_items:
         - docker
-        - iproute-tc
+        - iproute
+        #- iproute-tc
         - kubeadm
         - kubelet
     - name: Enable kubelet
@@ -32,6 +34,19 @@
         url: https://storage.googleapis.com/kubernetes-release/release/v1.7.2/bin/linux/amd64/kubectl
         dest: /usr/local/bin/kubectl
         mode: 0755
+    - name: Enable net bridge iptables
+      sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: 1
+        state: present
+        reload: yes
+    - name: Enable net bridge ip6tables
+      sysctl:
+        name: net.bridge.bridge-nf-call-ip6tables
+        value: 1
+        state: present
+        reload: yes
+
     #- name: Increase root LV to 5 GB
     #  command: lvresize -L 5G atomicos/root
     #  ignore_errors: true

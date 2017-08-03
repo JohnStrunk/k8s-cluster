@@ -5,11 +5,12 @@
   become: true
   tasks:
     - name: Install python
-      raw: dnf install -y python
-    - name: Gather facts
-      setup:
+      raw: yum install -y python
+      #raw: dnf install -y python
+#    - name: Gather facts
+#      setup:
 
 - include: plays/upgrade_host.yml
 - include: plays/basic_setup.yml
 - include: plays/install_k8s.yml
-
+- include: plays/deploy_gluster.yml
