@@ -1,5 +1,16 @@
 ---
 
+- hosts: all
+  become: true
+  tasks:
+     - name: Remove swap from fstab
+       lineinfile:
+         name: /etc/fstab
+         regexp: '\sswap\s'
+         state: absent
+     - name: Turn off swap
+       command: swapoff -a
+
 - hosts: master
   become: true
   vars:
@@ -46,13 +57,18 @@
   tasks:
     - name: Join on workers
       command: kubeadm join --skip-preflight-checks --token {{ k8s_init_token }} master:6443
-    - name: wait for node to be ready
-      shell: test "$(kubectl get nodes {{ ansible_hostname }} --no-headers | awk '{ print $2 }')" = "Ready"
+
+- hosts: master
+  become: true
+  tasks:
+    - name: wait for nodes to be ready
+      shell: test "$(kubectl get nodes {{ item }} --no-headers | awk '{ print $2 }')" = "Ready"
       register: task_result
       until: task_result.rc == 0
       delay: 10
       retries: 60
       changed_when: false
+      with_items: "{{ groups['workers'] }}"
 
 #- hosts: master
 #  tasks:

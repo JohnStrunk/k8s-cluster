@@ -42,8 +42,8 @@ Vagrant.configure("2") do |config|
             "workers" => (0..WORKERS-1).map {|j| "worker#{j}"}
           }
           ansible.limit = "all"
-          ansible.playbook = "ansible/provision.yml"
-          ansible.verbose = true
+          ansible.playbook = "ansible/initial_provisioning.yml"
+          #ansible.verbose = true
         end
       end
     end

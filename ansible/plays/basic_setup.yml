@@ -20,6 +20,7 @@
         - iproute
         #- iproute-tc
         - kubeadm
+        - kubectl
         - kubelet
     - name: Enable kubelet
       systemd:
@@ -31,11 +32,6 @@
         service: docker
         state: started
         enabled: true
-    - name: Install kubectl
-      get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/v1.7.2/bin/linux/amd64/kubectl
-        dest: /usr/local/bin/kubectl
-        mode: 0755
     - name: Enable net bridge iptables
       sysctl:
         name: net.bridge.bridge-nf-call-iptables
@@ -48,39 +44,3 @@
         value: 1
         state: present
         reload: yes
-
-    #- name: Increase root LV to 5 GB
-    #  command: lvresize -L 5G atomicos/root
-    #  ignore_errors: true
-    #- name: Resize root file system
-    #  command: xfs_growfs /dev/mapper/atomicos-root
-    #- name: Make sure all interfaces are up
-    #  systemd:
-    #    name=network
-    #    state=restarted
-    #- name: Refresh facts
-    #  setup:
-    #- name: build hosts file
-    #  lineinfile:
-    #    dest=/etc/hosts
-    #    regexp='.*{{ item }}$'
-    #    line="{{ hostvars[item].ansible_eth0.ipv4.address }} {{item}}"
-    #    state=present
-    #  when: hostvars[item].ansible_eth0.ipv4.address is defined
-    #  with_items: "{{ groups['all'] }}"
-    #- name: Add 'registry' dns name
-    #  lineinfile:
-    #    dest=/etc/hosts
-    #    regexp='.*registry$'
-    #    line="192.168.121.1 registry"
-    #    state=present
-    #- name: Allow 'registry' as insecure registry
-    #  lineinfile:
-    #    dest=/etc/sysconfig/docker
-    #    regexp='.*INSECURE_REGISTRY'
-    #    line='INSECURE_REGISTRY="--insecure-registry=192.168.0.0/16"'
-    #    state=present
-    #- name: Restart docker
-    #  systemd:
-    #    name=docker
-    #    state=restarted

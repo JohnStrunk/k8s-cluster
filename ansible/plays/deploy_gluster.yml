@@ -2,6 +2,19 @@
 
 # Deploys Gluster onto k8s nodes
 
+- hosts: all
+  become: true
+  tasks:
+    - name: Install gluster fuse client
+      yum:
+        name: glusterfs-fuse
+        state: present
+    - name: Make SELinux allow writing to gluster volumes
+      seboolean:
+        name: virt_sandbox_use_fusefs
+        state: on
+        persistent: yes
+
 - hosts: workers
   become: true
   vars:
@@ -90,7 +103,7 @@
       command: kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster peer probe {{ item }}
       with_items: "{{ gluster_nodes }}"
     - name: Create volume
-      command: "kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster volume create vol1 replica 3 arbiter 1 {{ gluster_nodes | map('regex_replace', '(.+)', '\1:/mnt/bricks/vdb/b') | join (' ') }}"
+      command: "kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster volume create vol1 replica 3 arbiter 1 {{ gluster_nodes | map('regex_replace', '(.+)', '\\1:/mnt/bricks/vdb/b') | join (' ') }}"
     - name: Start volume
       command: kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster volume start vol1
 #    - name: Copy PV templates for big volume
