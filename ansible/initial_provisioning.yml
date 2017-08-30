@@ -13,4 +13,3 @@
 - include: plays/upgrade_host.yml
 - include: plays/basic_setup.yml
 - include: plays/install_k8s.yml
-- include: plays/deploy_gluster.yml
