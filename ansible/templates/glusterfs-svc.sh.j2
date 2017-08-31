@@ -1,0 +1,39 @@
+#! /bin/bash
+
+gluster_ips=$(kubectl -n {{ ns }} get po -l glusterfs-node=pod -o jsonpath='{.items[*].status.podIP}')
+
+file=$(mktemp tmp.XXXXXXXX.yml)
+
+cat - > ${file} << HEAD
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: glusterfs-cluster
+  namespace: {{ ns }}
+subsets:
+HEAD
+for i in ${gluster_ips}; do
+        cat - >> ${file} << LOOP
+- addresses:
+  - ip: $i
+  ports:
+  - port: 1
+LOOP
+done
+cat - >> ${file} << TAIL
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: glusterfs-cluster
+  namespace: {{ ns }}
+spec:
+  ports:
+  - port: 1
+TAIL
+
+kubectl create -f ${file}
+rm ${file}

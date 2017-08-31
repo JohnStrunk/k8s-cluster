@@ -1,0 +1,35 @@
+---
+
+- name: Create LV
+  command: lvcreate -V {{ brick_size }} -n {{ brick_name }} vg_brick/pool
+  args:
+    creates: /dev/vg_brick/{{ brick_name }}
+
+- name: Make sure mount point exists
+  file:
+    state: directory
+    name: /bricks/{{ brick_name }}
+
+- name: Make sure the brick is not mounted
+  mount:
+    path: /bricks/{{ brick_name }}
+    state: unmounted
+
+- name: Format brick
+  filesystem:
+    fstype: xfs
+    dev: /dev/vg_brick/{{ brick_name }}
+    opts: -i size=512
+
+- name: Mount file systems
+  mount:
+    path: /bricks/{{ brick_name }}
+    src: /dev/vg_brick/{{ brick_name }}
+    fstype: xfs
+    opts: rw,noatime,inode64,nouuid
+    state: mounted
+
+- name: Create brick directory
+  file:
+    name: /bricks/{{ brick_name }}/brick
+    state: directory
