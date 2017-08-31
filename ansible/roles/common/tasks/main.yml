@@ -1,0 +1,74 @@
+---
+- name: Upgrade system
+  yum:
+    name: "*"
+    state: latest
+  register: upgrade
+
+- name: Reboot if packages were upgraded
+  shell: sleep 2 && systemctl reboot
+  async: 1
+  poll: 0
+  when: upgrade.changed == true
+
+- name: Wait for host to be available after reboot
+  local_action: wait_for
+  args:
+    host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+    port: "{{ ansible_ssh_port }}"
+    search_regex: OpenSSH
+    delay: 3
+  when: upgrade.changed == true
+
+- name: Put SELinux in permissive mode
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: Add kubernetes package repo
+  template:
+    src: k8s.repo.j2
+    dest: /etc/yum.repos.d/k8s.repo
+
+- name: Add kubernetes prereq packages
+  yum:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - docker
+    - iproute
+    - kubeadm
+    - kubectl
+    - kubelet
+
+- name: Enable services
+  systemd:
+    service: "{{ item }}"
+    state: started
+    enabled: true
+  with_items:
+    - docker
+    - kubelet
+
+- name: Enable net bridge iptables
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    state: present
+    reload: yes
+
+- name: Enable net bridge ip6tables
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    state: present
+    reload: yes
+
+- name: Remove swap from fstab
+  lineinfile:
+    name: /etc/fstab
+    regexp: '\sswap\s'
+    state: absent
+
+- name: Turn off swap
+  command: swapoff -a

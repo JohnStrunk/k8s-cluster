@@ -1,0 +1,3 @@
+---
+- name: Join on workers
+  command: kubeadm join --skip-preflight-checks --token {{ k8s_init_token }} master:6443

@@ -1,0 +1,47 @@
+---
+- name: kubeadm init on master
+  command: kubeadm init --token {{ k8s_init_token }}
+  args:
+    creates: /etc/kubernetes/admin.conf
+
+- name: Create /root/.kube
+  file:
+    path: /root/.kube
+    state: directory
+
+- name: Create .kube config (root)
+  copy:
+    remote_src: true
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    owner: root
+    group: root
+
+- name: Create /home/vagrant/.kube
+  file:
+    path: /home/vagrant/.kube
+    state: directory
+    owner: vagrant
+    group: vagrant
+
+- name: Create .kube config (vagrant)
+  copy:
+    remote_src: true
+    src: /etc/kubernetes/admin.conf
+    dest: /home/vagrant/.kube/config
+    owner: vagrant
+    group: vagrant
+
+- name: Apply a pod network (weave)
+  shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+- name: Get DNS address
+  shell: kubectl get services --all-namespaces | grep kube-dns | awk "{print \$3}"
+  register: dnsaddr
+
+- name: Wait for DNS to be ready
+  wait_for:
+    host: "{{ dnsaddr.stdout }}"
+    port: 53
+    state: started
+    timeout: 600

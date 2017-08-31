@@ -3,13 +3,30 @@
 - hosts: all
   gather_facts: false
   become: true
-  tasks:
+  pre_tasks:
     - name: Install python
-      raw: yum install -y python
-      #raw: dnf install -y python
-#    - name: Gather facts
-#      setup:
+      raw: yum install -y python libselinux-python
+  roles:
+    - common
 
-- include: plays/upgrade_host.yml
-- include: plays/basic_setup.yml
-- include: plays/install_k8s.yml
+- hosts: master
+  become: true
+  roles:
+    - { role: k8s-master, k8s_init_token: '000000.1111111111111111' }
+
+- hosts: workers
+  become: true
+  roles:
+    - { role: k8s-worker, k8s_init_token: '000000.1111111111111111' }
+
+- hosts: master
+  become: true
+  tasks:
+    - name: Wait for workers to be ready
+      shell: test "$(kubectl get nodes {{ item }} --no-headers | awk '{ print $2 }')" = "Ready"
+      register: task_result
+      until: task_result.rc == 0
+      delay: 10
+      retries: 60
+      changed_when: false
+      with_items: "{{ groups['workers'] }}"
