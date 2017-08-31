@@ -1,5 +1,13 @@
 ---
-
+##############################
+# This playbook changes the running version of k8s by loading a
+# release that has been built from source.
+# Checkout k8s source and build via: 'make quick-release'
+# Set the 'k8s_files' variable below to the location of the release tars
+#
+# It may be necessary to reboot the nodes and/or restart various services
+# since this sort of "upgrade" isn't a supported operation.
+#
 # These steps based on: https://crondev.com/kubernetes-upgrade-kubeadm/
 
 - hosts: all
@@ -20,6 +28,8 @@
         - kube-proxy.tar
         - kube-scheduler.tar
 
+    # We move the binaries instead of directly overwrite since kubelet is
+    # currently running
     - name: Move old binaries
       command: mv /usr/bin/{{ item }} /usr/bin/{{ item }}.bak
       with_items:
