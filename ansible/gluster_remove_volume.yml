@@ -1,0 +1,38 @@
+---
+##############################
+# Stop and remove a gluster volume
+# Requires:
+#   volume_name: name of the volume to create
+
+- hosts: master
+  vars:
+    ns: glusterfs
+  tasks:
+    - name: Get a gluster pod name
+      command: kubectl -n {{ ns }} get po -l glusterfs-node=pod -o jsonpath='{.items[0].metadata.name}'
+      register: gpodname
+
+    - name: Stop volume
+      command: kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- echo y \| gluster volume stop {{ volume_name }}
+
+    - name: Delete volume
+      command: kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- echo y \| gluster volume delete {{ volume_name }}
+
+
+- hosts: worker0, worker1, worker2
+  become: true
+  tasks:
+    - name: Unmount the brick
+      mount:
+        path: /bricks/{{ volume_name }}
+        state: unmounted
+
+    - name: Remove mount point
+      file:
+        state: absent
+        name: /bricks/{{ volume_name }}
+
+    - name: Delete LV
+      command: lvremove -f vg_brick/{{ volume_name }}
+      args:
+        removes: /dev/vg_brick/{{ volume_name }}

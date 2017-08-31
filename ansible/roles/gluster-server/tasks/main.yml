@@ -21,5 +21,3 @@
   command: lvcreate -l 100%FREE --thinpool vg_brick/pool
   args:
     creates: /dev/mapper/vg_brick-pool
-
-- include: mk_brick.yml brick_name='b1' brick_size='5G'

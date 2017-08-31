@@ -70,3 +70,16 @@
     - name: Create endpoint and service
       command: /tmp/glusterfs-svc.sh
 
+    - name: Get a gluster pod name
+      command: kubectl -n {{ ns }} get po -l glusterfs-node=pod -o jsonpath='{.items[0].metadata.name}'
+      register: gpodname
+
+    - name: Create the TSP (peer probe)
+      command: kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster peer probe {{ item }}
+      with_items: "{{ gluster_nodes }}"
+
+#    - name: Create volume
+#      command: "kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster volume create vol1 replica 3 arbiter 1 {{ gluster_nodes | map('regex_replace', '(.+)', '\\1:/mnt/bricks/vdb/b') | join (' ') }}"
+#    - name: Start volume
+#      command: kubectl -n {{ ns }} exec {{ gpodname.stdout }} -- gluster volume start vol1
+

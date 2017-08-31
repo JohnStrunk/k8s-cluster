@@ -1,0 +1,59 @@
+= A kubeadm-based Kubernetes cluster in Vagrant
+
+== Basic usage
+To bring up a basic multi-node cluster, just run:
+
+[source, bash]
+----
+$ vagrant up
+----
+
+To customize the number of nodes, edit `WORKERS` at the top of the
+`Vagrantfile`.
+
+== Upgrading the version of Kubernetes
+
+By default, the cluster is built with the most recent version supported by
+`kubeadm`. For development, you can upgrade the version on the nodes using the
+included Ansible playbook. Make sure you update the `k8s_files` variable first
+to point to your source directory.
+
+Since the Vagrant environment requires special inventory files and ssh
+parameters, instead of directly invoking `ansible-playbook`, use the included
+`acmd` script:
+
+[source, bash]
+----
+$ ./acmd ansible/upgrade_k8s_source.yml
+----
+
+== Working with Gluster
+
+The repo also contains a number of playbooks for working with Gluster in this
+environment. Currently it is written assuming exactly 3 worker nodes that will
+serve as Gluster servers, and each are expected to have a spare disk available
+(`vdb`).
+
+Deploy Gluster::
+[source, bash]
+----
+$ ./acmd ansible/deploy_gluster.yml
+----
+Create a volume::
+[source, bash]
+----
+$ ./acmd -e volume_name=myvol -e brick_size=10GiB ansible/gluster_create_volume.yml
+----
+Delete a volume::
+[source, bash]
+----
+$ ./acmd -e volume_name=myvol ansible/gluster_delete_volume.yml
+----
+Removing the deployment::
+You can get rid of the Gluster deployment by first deleting all the volumes,
+then running:
+[source, bash]
+----
+$ vagrant ssh master
+(master)$ kubectl delete ns/glusterfs
+----
