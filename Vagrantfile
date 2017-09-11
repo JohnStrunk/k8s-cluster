@@ -18,8 +18,11 @@ Vagrant.configure("2") do |config|
   # Can't write to /vagrant on atomic-host, so disable default sync dir
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
+
   config.vm.define "master" do |node|
     node.vm.hostname = "master"
+    # master gets this repo synced to /vagrant
+    node.vm.synced_folder ".", "/vagrant", type: "sshfs"
   end
 
   (0..WORKERS-1).each do |i|
