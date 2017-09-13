@@ -44,13 +44,13 @@
       command: kubectl label nodes {{ item }} --overwrite storagenode=glusterfs
       with_items: "{{ gluster_nodes }}"
 
-    - name: Copy Gluster daemonset template
-      template:
-        src: templates/glusterfs-daemonset.yaml.j2
+    - name: Copy Gluster daemonset description
+      copy:
+        src: templates/glusterfs-daemonset.yaml
         dest: /tmp/glusterfs-daemonset.yaml
 
     - name: Deploy Gluster daemonset
-      command: kubectl create -f /tmp/glusterfs-daemonset.yaml
+      command: kubectl -n {{ ns }} apply -f /tmp/glusterfs-daemonset.yaml
 
     - name: Wait for gluster pods to be ready
       shell: test "$(kubectl -n {{ ns }} get ds/glusterfs -o jsonpath='{.status.numberReady}')" = "$(kubectl -n {{ ns }} get ds/glusterfs -o jsonpath='{.status.desiredNumberScheduled}')"
@@ -59,16 +59,6 @@
       delay: 10
       retries: 60
       changed_when: false
-
-    # Create endpoints and service
-    - name: Copy endpoint script
-      template:
-        src: templates/glusterfs-svc.sh.j2
-        dest: /tmp/glusterfs-svc.sh
-        mode: 0755
-
-    - name: Create endpoint and service
-      command: /tmp/glusterfs-svc.sh
 
     - name: Get a gluster pod name
       command: kubectl -n {{ ns }} get po -l glusterfs-node=pod -o jsonpath='{.items[0].metadata.name}'
