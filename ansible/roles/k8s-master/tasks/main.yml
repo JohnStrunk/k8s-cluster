@@ -36,7 +36,7 @@
   shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
 - name: Get DNS address
-  shell: kubectl get services --all-namespaces | grep kube-dns | awk "{print \$3}"
+  command: kubectl get -n kube-system svc/kube-dns -ojsonpath='{.spec.clusterIP}'
   register: dnsaddr
 
 - name: Wait for DNS to be ready
