@@ -12,12 +12,8 @@
   when: upgrade.changed == true
 
 - name: Wait for host to be available after reboot
-  local_action: wait_for
-  args:
-    host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
-    port: "{{ ansible_ssh_port }}"
-    search_regex: OpenSSH
-    delay: 3
+  wait_for_connection:
+    delay: 15
   when: upgrade.changed == true
 
 - name: Put SELinux in permissive mode
