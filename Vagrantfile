@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "worker#{i}" do |node|
       node.vm.hostname = "worker#{i}"
       node.vm.provider "libvirt" do |provider|
-        for d in 0..DISKS-1 do
+        for _ in 0..DISKS-1 do
           provider.storage :file, :size => DISKSIZE
         end
       end
