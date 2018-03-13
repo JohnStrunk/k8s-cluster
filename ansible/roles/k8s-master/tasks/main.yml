@@ -1,6 +1,11 @@
 ---
+- name: Copy config to master
+  template:
+    src: config.yml
+    dest: /tmp/kubeadm_conf.yml
+
 - name: kubeadm init on master
-  command: kubeadm init --token {{ k8s_init_token }}
+  command: kubeadm init --config /tmp/kubeadm_conf.yml
   args:
     creates: /etc/kubernetes/admin.conf
 
