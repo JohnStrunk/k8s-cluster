@@ -1,3 +1,6 @@
 ---
 - name: Join on workers
-  command: kubeadm join --ignore-preflight-errors=all --token {{ k8s_init_token }} --discovery-token-unsafe-skip-ca-verification master:6443
+  command: >
+          kubeadm join --ignore-preflight-errors=all
+          --token {{ k8s_init_token }}
+          --discovery-token-unsafe-skip-ca-verification master:6443

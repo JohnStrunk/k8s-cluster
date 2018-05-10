@@ -57,24 +57,35 @@
     - name: Update container varsions in manifests
       lineinfile:
         name: /etc/kubernetes/manifests/{{ item }}.yaml
-        backrefs: yes
+        backrefs: "yes"
         regexp: "    image: "
-        line: "    image: gcr.io/google_containers/{{ item }}:{{kubeVersion.stdout}}"
+        line: "    image: gcr.io/google_containers/{{ item
+              }}:{{kubeVersion.stdout}}"
       with_items:
         - kube-apiserver
         - kube-controller-manager
         - kube-scheduler
 
     - name: Patch kube-proxy DaemonSet
-      command: kubectl -n kube-system patch ds/kube-proxy -p '{"spec":{"template":{"spec":{"containers":[{"name":"kube-proxy","image":"gcr.io/google_containers/kube-proxy:{{kubeVersion.stdout}}"}]}}}}'
+      command: >
+              kubectl -n kube-system patch ds/kube-proxy
+              -p '{"spec":{"template":{"spec":{"containers":
+                      [{"name":"kube-proxy",
+                        "image":"gcr.io/google_containers/kube-proxy:{{
+                                kubeVersion.stdout}}"}]}}}}'
 
     - name: Re-apply weave-net to allow it to upgrade if necessary
-      shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+      shell: >
+              kubectl apply -f
+              "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version |
+              base64 | tr -d '\n')"
 
     - name: Get name of DNS pod
-      command: kubectl -n kube-system get po -l k8s-app=kube-dns -o jsonpath='{.items[0].metadata.name}'
+      command: >
+              kubectl -n kube-system get po -l k8s-app=kube-dns
+              -o jsonpath='{.items[0].metadata.name}'
       register: dnspodname
 
-      #-- We delete the DNS pod and the deployment will recreate it
+      # -- We delete the DNS pod and the deployment will recreate it
     - name: Delete DNS pod
       command: kubectl -n kube-system delete po/{{ dnspodname.stdout }}

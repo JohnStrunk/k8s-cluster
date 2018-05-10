@@ -51,14 +51,14 @@
     name: net.bridge.bridge-nf-call-iptables
     value: 1
     state: present
-    reload: yes
+    reload: true
 
 - name: Enable net bridge ip6tables
   sysctl:
     name: net.bridge.bridge-nf-call-ip6tables
     value: 1
     state: present
-    reload: yes
+    reload: true
 
 - name: Remove swap from fstab
   lineinfile:

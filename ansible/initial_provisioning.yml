@@ -7,19 +7,17 @@
   gather_facts: false
   become: true
   tasks:
-  # Sometimes provisioning starts before all hosts are up and ready,
-  # causing failures. Here, we delay until we can ansible ping
-  - name: Wait for host to be available
-    ping:
-      data: "pong"
-    register: task_result
-    until: task_result.ping == "pong"
-    delay: 2
-    retries: 60
-    changed_when: false
+    - name: Wait for host to be available
+      ping:
+        data: "pong"
+      register: task_result
+      until: task_result.ping == "pong"
+      delay: 2
+      retries: 60
+      changed_when: false
 
-  - name: Install python
-    raw: yum install -y python libselinux-python
+    - name: Install python
+      raw: yum install -y python libselinux-python
 
 - hosts: all
   become: true
@@ -29,18 +27,19 @@
 - hosts: master
   become: true
   roles:
-    - { role: k8s-master, k8s_init_token: '000000.1111111111111111' }
+    - {role: k8s-master, k8s_init_token: '000000.1111111111111111'}
 
 - hosts: workers
   become: true
   roles:
-    - { role: k8s-worker, k8s_init_token: '000000.1111111111111111' }
+    - {role: k8s-worker, k8s_init_token: '000000.1111111111111111'}
 
 - hosts: master
   become: true
   tasks:
     - name: Wait for workers to be ready
-      shell: test "$(kubectl get nodes {{ item }} --no-headers | awk '{ print $2 }')" = "Ready"
+      shell: test "$(kubectl get nodes {{ item }} --no-headers |
+             awk '{ print $2 }')" = "Ready"
       register: task_result
       until: task_result.rc == 0
       delay: 10

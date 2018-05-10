@@ -38,10 +38,15 @@
     group: vagrant
 
 - name: Apply a pod network (weave)
-  shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+  shell: >
+          kubectl apply -f
+          "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version |
+              base64 | tr -d '\n')"
 
 - name: Get DNS address
-  command: kubectl get -n kube-system svc/kube-dns -ojsonpath='{.spec.clusterIP}'
+  command: >
+          kubectl get -n kube-system svc/kube-dns
+          -o jsonpath='{.spec.clusterIP}'
   register: dnsaddr
 
 - name: Wait for DNS to be ready
