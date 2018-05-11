@@ -1,5 +1,7 @@
 = A kubeadm-based Kubernetes cluster in Vagrant
 
+image:https://travis-ci.com/JohnStrunk/k8s-cluster.svg?branch=master["Build Status", link="https://travis-ci.com/JohnStrunk/k8s-cluster"]
+
 == Basic usage
 To bring up a basic multi-node cluster, just run:
 
