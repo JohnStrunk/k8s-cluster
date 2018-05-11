@@ -16,15 +16,7 @@ matrix:
           find . -regextype egrep -iregex '.*\.md' -print0 |
             xargs -0rt mdl
 
-    # shellcheck
-    - name: shellcheck
-      language: bash
-      script:
-        - >
-          find . -regextype egrep -iregex '.*\.(ba)?sh' -print0 |
-            xargs -0rt shellcheck
-
-    # yamllint
+    # yamllint & shellcheck
     - name: yamllint
       language: python
       install:
@@ -33,3 +25,7 @@ matrix:
         - >
           find . -regextype egrep -iregex '.*\.ya?ml' -print0 |
             xargs -0rt yamllint
+        # shellcheck is built into Travis. Can put it anywhere
+        - >
+          find . -regextype egrep -iregex '.*\.(ba)?sh' -print0 |
+            xargs -0rt shellcheck
