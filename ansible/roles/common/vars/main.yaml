@@ -1,0 +1,8 @@
+---
+
+k8s_packages:
+  - docker
+  - iproute
+  - kubeadm
+  - kubectl
+  - kubelet
