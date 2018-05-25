@@ -24,7 +24,7 @@ matrix:
       script:
         - >
           find . -regextype egrep -iregex '.*\.ya?ml' -print0 |
-            xargs -0rt yamllint
+            xargs -0rt yamllint -s
         # shellcheck is built into Travis. Can put it anywhere
         - >
           find . -regextype egrep -iregex '.*\.(ba)?sh' -print0 |

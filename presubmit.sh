@@ -26,7 +26,7 @@ fi
 
 if [ -x "$(command -v yamllint)" ]; then
     find . -regextype egrep -iregex '.*\.ya?ml' -print0 | \
-        xargs -0rt yamllint
+        xargs -0rt yamllint -s
 else
     echo "Warning: Not checking yaml files... no yamllint"
 fi
