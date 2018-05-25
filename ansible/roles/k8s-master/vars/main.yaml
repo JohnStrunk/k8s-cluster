@@ -1,0 +1,5 @@
+---
+
+feature_gates:
+  - "BlockVolume=true"
+  - "CustomResourceSubresources=true"

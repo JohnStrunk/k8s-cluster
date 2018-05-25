@@ -3,9 +3,9 @@ apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
 token: "{{ k8s_init_token }}"
 apiServerExtraArgs:
-  feature-gates: "CSIPersistentVolume=true,MountPropagation=true"
+  feature-gates: "{{ feature_gates|join(',') }}"
   runtime-config: "storage.k8s.io/v1alpha1=true"
 controllerManagerExtraArgs:
-  feature-gates: "CSIPersistentVolume=true,MountPropagation=true"
+  feature-gates: "{{ feature_gates|join(',') }}"
 schedulerExtraArgs:
-  feature-gates: "CSIPersistentVolume=true,MountPropagation=true"
+  feature-gates: "{{ feature_gates|join(',') }}"
