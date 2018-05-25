@@ -1,0 +1,40 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+    - name: Create /dev/vd* ==> /dev/kube_blk_devs/vd* udev rule
+      copy:
+        content: >
+                KERNEL=="vd[b-z]*",
+                SUBSYSTEM=="block",
+                SYMLINK+="kube_blk_devs/%k"
+        dest: /etc/udev/rules.d/90-hdd-links.rules
+      register: udev_hdd_rule
+
+    - name: Reload udev rules
+      command: "udevadm control --reload"
+      when: udev_hdd_rule.changed
+
+    - name: Trigger udev events
+      command: "udevadm trigger"
+      when: udev_hdd_rule.changed
+
+- hosts: master
+  become: false
+  tasks:
+    - name: Copy StorageClass template
+      copy:
+        src: sc.yaml
+        dest: /tmp/sc.yaml
+
+    - name: Apply StorageClass
+      command: kubectl apply -f /tmp/sc.yaml
+
+    - name: Copy provisioner template
+      copy:
+        src: local-provisioner.yaml
+        dest: /tmp/local-provisioner.yaml
+
+    - name: Apply local provisioner
+      command: kubectl apply -f /tmp/local-provisioner.yaml
