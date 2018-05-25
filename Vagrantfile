@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 WORKERS = 3
-DISKS = 1
+DISKS = 2
 DISKSIZE = "30G"
 
 Vagrant.configure("2") do |config|
