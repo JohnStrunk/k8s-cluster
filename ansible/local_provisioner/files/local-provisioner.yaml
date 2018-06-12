@@ -12,7 +12,8 @@ data:
        hostDir: /dev/kube_blk_devs
        mountDir:  /dev/kube_blk_devs
        blockCleanerCommand:
-         - "/scripts/blkdiscard.sh"
+         # - "/scripts/blkdiscard.sh"
+         - "/scripts/quick_reset.sh"
 
 ---
 

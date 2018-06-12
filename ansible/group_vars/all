@@ -3,3 +3,4 @@
 feature_gates:
   - "BlockVolume=true"
   - "CustomResourceSubresources=true"
+k8s_init_token: "000000.1111111111111111"

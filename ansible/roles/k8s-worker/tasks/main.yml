@@ -4,3 +4,18 @@
           kubeadm join --ignore-preflight-errors=all
           --token {{ k8s_init_token }}
           --discovery-token-unsafe-skip-ca-verification master:6443
+
+- name: Add feature gates to kubelet
+  lineinfile:
+    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    line: >
+      Environment="KUBELET_EXTRA_ARGS=
+      --feature-gates={{ feature_gates|join(',') }}"
+    insertafter: "^Environment="
+    state: present
+
+- name: Restart kubelet
+  systemd:
+    name: kubelet
+    daemon_reload: true
+    state: restarted
