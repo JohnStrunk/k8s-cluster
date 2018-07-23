@@ -7,15 +7,6 @@
   gather_facts: false
   become: true
   tasks:
-    - name: Wait for host to be available
-      ping:
-        data: "pong"
-      register: task_result
-      until: task_result.ping == "pong"
-      delay: 2
-      retries: 60
-      changed_when: false
-
     - name: Install python
       raw: yum install -y python libselinux-python
 
@@ -35,8 +26,14 @@
     - k8s-worker
 
 - hosts: master
-  become: true
+  become: false
   tasks:
+    - name: Retrieve kube config
+      fetch:
+        src: /home/vagrant/.kube/config
+        dest: ../kubeconfig
+        flat: true
+
     - name: Wait for workers to be ready
       shell: test "$(kubectl get nodes {{ item }} --no-headers |
              awk '{ print $2 }')" = "Ready"
