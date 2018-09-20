@@ -3,6 +3,6 @@
 k8s_packages:
   - docker
   - iproute
-  - kubeadm
-  - kubectl
-  - kubelet
+  - kubeadm-{{ k8s_version }}
+  - kubectl-{{ k8s_version }}
+  - kubelet-{{ k8s_version }}

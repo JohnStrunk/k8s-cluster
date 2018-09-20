@@ -1,4 +1,9 @@
 ---
+- name: Add kubernetes package repo
+  template:
+    src: k8s.repo.j2
+    dest: /etc/yum.repos.d/k8s.repo
+
 - name: Upgrade system
   yum:
     name: "*"
@@ -21,14 +26,10 @@
     policy: targeted
     state: permissive
 
-- name: Add kubernetes package repo
-  template:
-    src: k8s.repo.j2
-    dest: /etc/yum.repos.d/k8s.repo
-
 - name: Add kubernetes prereq packages
   yum:
-    state: latest
+    state: installed
+    allow_downgrade: true
     name: "{{ k8s_packages }}"
 
 - name: Enable services
