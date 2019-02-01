@@ -5,9 +5,16 @@
     dest: /tmp/kubeadm_conf.yml
 
 - name: kubeadm init on master
-  command: kubeadm init --config /tmp/kubeadm_conf.yml
+  command: kubeadm init --config /tmp/kubeadm_conf.yml 
   args:
     creates: /etc/kubernetes/admin.conf
+
+- firewalld:
+    port: 6443/tcp
+    permanent: yes
+    state: enabled
+    immediate: yes
+  failed_when: false
 
 - name: Create /root/.kube
   file:
@@ -28,6 +35,8 @@
     state: directory
     owner: vagrant
     group: vagrant
+  tags:
+    - vagrant-only
 
 - name: Create .kube config (vagrant)
   copy:
@@ -36,22 +45,20 @@
     dest: /home/vagrant/.kube/config
     owner: vagrant
     group: vagrant
-
-- name: Apply a pod network (weave)
+  tags:
+    - vagrant-only
+- name: Apply a pod network (flannel)
   shell: >
-          kubectl apply -f
-          "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version |
-              base64 | tr -d '\n')"
+        kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml
 
-- name: Get DNS address
-  command: >
-          kubectl get -n kube-system svc/kube-dns
-          -o jsonpath='{.spec.clusterIP}'
-  register: dnsaddr
-
-- name: Wait for DNS to be ready
-  wait_for:
-    host: "{{ dnsaddr.stdout }}"
-    port: 53
-    state: started
-    timeout: 600
+- block:
+    - name: Wait for DNS to be ready
+      command: >
+              kubectl get -n kube-system svc/kube-dns
+              -o jsonpath='{.spec.clusterIP}'
+      register: dnsaddr
+    - wait_for:
+        host: "{{ dnsaddr.stdout }}"
+        port: 53
+        state: started
+        timeout: 600

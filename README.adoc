@@ -2,6 +2,13 @@
 
 image:https://travis-ci.com/JohnStrunk/k8s-cluster.svg?branch=master["Build Status", link="https://travis-ci.com/JohnStrunk/k8s-cluster"]
 
+== Prerequisites
+The vagrant-sshfs plugin must be installed via:
+```
+vagrant plugin install vagrant-sshfs
+```
+Also ensure the disk size and memory of the VMs specified in `Vagrantfile` is appropriate for your system
+
 == Basic usage
 To bring up a basic multi-node cluster, just run:
 

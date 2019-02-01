@@ -43,8 +43,7 @@ imageRepository: k8s.gcr.io
 kubernetesVersion: "{{ k8s_version }}"
 networking:
   dnsDomain: cluster.local
-  podSubnet: ""
-  serviceSubnet: 10.96.0.0/12
+  podSubnet: 10.244.0.0/16
 scheduler:
   extraArgs:
     feature-gates: "{{ feature_gates|join(',') }}"

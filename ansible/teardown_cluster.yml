@@ -30,6 +30,8 @@
     - file:
         name: /home/vagrant/.kube
         state: absent
+      tags:
+        - vagrant-only
 
 
 - hosts: all

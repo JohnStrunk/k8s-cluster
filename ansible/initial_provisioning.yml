@@ -30,7 +30,7 @@
   tasks:
     - name: Retrieve kube config
       fetch:
-        src: /home/vagrant/.kube/config
+        src: ~/.kube/config
         dest: ../kubeconfig
         flat: true
 

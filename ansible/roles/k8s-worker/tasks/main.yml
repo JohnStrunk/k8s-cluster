@@ -3,7 +3,7 @@
   command: >
           kubeadm join --ignore-preflight-errors=all
           --token {{ k8s_init_token }}
-          --discovery-token-unsafe-skip-ca-verification master:6443
+          --discovery-token-unsafe-skip-ca-verification {{ groups['masters'][0] }}:6443
 
 - name: Add feature gates to kubelet
   lineinfile:
