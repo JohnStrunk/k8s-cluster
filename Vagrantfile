@@ -9,15 +9,21 @@ Vagrant.configure("2") do |config|
   #config.vm.box = "fedora/26-cloud-base"
   config.vm.box = "centos/7"
   config.vm.provider "libvirt" do |lv|
+    lv.channel :type => "unix", :target_name => "org.qemu.guest_agent.0", :target_type => "virtio"
     lv.cpus = "2"
+    lv.cpu_mode = "host-passthrough"
+    lv.graphics_type = "none"
     lv.memory = "2048"
-    lv.nested = true
-    lv.volume_cache = "none"
+    lv.nested = false
+    lv.random :model => "random"
+    # lv.usb_controller :model => "none"  # (requires vagrant-libvirt 0.44 which is not in Fedora yet)
+    lv.volume_cache = "writeback"
+    lv.video_type = "vga"
+    lv.video_vram = "1024"
   end
 
   # Can't write to /vagrant on atomic-host, so disable default sync dir
   config.vm.synced_folder ".", "/vagrant", disabled: true
-
 
   config.vm.define "master" do |node|
     node.vm.hostname = "master"
@@ -37,16 +43,12 @@ Vagrant.configure("2") do |config|
       # called once during the provisioning step.
       if i == WORKERS-1
         node.vm.provision :ansible do |ansible|
-          #ansible.extra_vars = {
-          #  "master_ip" => MASTER_IP
-          #}
           ansible.groups = {
             "masters" => ["master"],
             "workers" => (0..WORKERS-1).map {|j| "worker#{j}"}
           }
           ansible.limit = "all"
           ansible.playbook = "ansible/initial_provisioning.yml"
-          #ansible.verbose = true
         end
       end
     end
