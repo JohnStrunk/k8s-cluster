@@ -43,3 +43,32 @@
       retries: 60
       changed_when: false
       with_items: "{{ groups['workers'] }}"
+
+- hosts: localhost
+  gather_facts: false
+  become: false
+  vars:
+    - kubeconfig: ../kubeconfig
+  tasks:
+    - name: Look for helm
+      command: "which helm"
+      register: which_helm
+      changed_when: false
+      failed_when: which_helm.rc != 0 and which_helm.rc != 1
+
+    - block:
+        - set_fact:
+            helm: "{{ which_helm.stdout }}"
+
+        - name: Create service account for Tiller
+          command: >-
+                  kubectl
+                  --kubeconfig=../kubeconfig
+                  apply -f files/helm-tiller-sa.yml
+
+        - name: Install Tiller
+          command: >-
+                  {{ helm }} init
+                  --kubeconfig=../kubeconfig
+                  --service-account tiller
+      when: which_helm.rc == 0
