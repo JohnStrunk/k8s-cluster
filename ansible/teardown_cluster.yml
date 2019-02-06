@@ -18,7 +18,7 @@
   become: true
   tasks:
     - name: Reset kubeadm
-      command: kubeadm reset
+      command: kubeadm reset -f
 
 - hosts: master
   become: true
@@ -35,7 +35,7 @@
 - hosts: all
   become: true
   tasks:
-    - name: Reboot if packages were upgraded
+    - name: Reboot
       shell: sleep 2 && systemctl reboot
       async: 1
       poll: 0
