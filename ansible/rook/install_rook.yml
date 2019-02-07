@@ -1,0 +1,28 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+  become: false
+  vars:
+    - kubeconfig: ../../kubeconfig
+    - files: ./files
+    - kubectl: kubectl --kubeconfig={{ kubeconfig }}
+  tasks:
+    - name: Label nodes
+      command: "{{ kubectl }} label --overwrite nodes {{ item }} role=storage-node"
+      with_items: "{{ groups['workers'] }}"
+
+    - name: Install rook operator
+      command: "{{ kubectl }} apply -f {{ files }}/operator.yaml"
+
+    - name: Wait for rook to be running
+      shell: "{{ kubectl }} get -n rook-ceph-system po | grep -c Running"
+      register: task_result
+      ignore_errors: true
+      until: task_result.stdout == "7"
+      delay: 10
+      retries: 60
+      changed_when: false
+
+    - name: Create cluster
+      command: "{{ kubectl }} apply -f {{ files }}/cluster.yaml"

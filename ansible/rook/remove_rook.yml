@@ -1,0 +1,63 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+  become: false
+  vars:
+    - kubeconfig: ../../kubeconfig
+    - files: ./files
+    - kubectl: kubectl --kubeconfig={{ kubeconfig }}
+  tasks:
+    - name: Remove clusters
+      command: "{{ kubectl }} -n rook-ceph delete --ignore-not-found cephcluster/rook-ceph"
+
+    - name: Wait for clusters to be deleted
+      shell: "{{ kubectl }} get -n rook-ceph cephclusters | wc -l"
+      register: task_result
+      until: task_result.stdout == "0"
+      delay: 10
+      retries: 60
+      changed_when: false
+
+    - name: Remove namespaces
+      command: "{{ kubectl }} delete --ignore-not-found ns/{{ item }}"
+      with_items:
+        - rook-ceph
+        - rook-ceph-system
+
+    - name: Wait for namespaces to be deleted
+      shell: "{{ kubectl }} get ns | grep -c {{ item }}"
+      with_items:
+        - rook-ceph
+        - rook-ceph-system
+      register: task_result
+      ignore_errors: true
+      until: task_result.stdout == "0"
+      delay: 10
+      retries: 60
+      changed_when: false
+
+    - name: Remove CRDs
+      command: "{{ kubectl }} delete --ignore-not-found crd/{{ item }}"
+      with_items:
+        - cephblockpools.ceph.rook.io
+        - cephclusters.ceph.rook.io
+        - cephfilesystems.ceph.rook.io
+        - cephnfses.ceph.rook.io
+        - cephobjectstores.ceph.rook.io
+        - cephobjectstoreusers.ceph.rook.io
+        - volumes.rook.io
+
+- hosts: workers
+  become: true
+  tasks:
+    - name: reset devices
+      command: "wipefs -a {{ item }}"
+      with_items:
+        - /dev/vdb
+
+    - name: Remove device mapper entries
+      shell: "ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %"
+
+    - name: Remove device nodes
+      shell: "rm -rf /dev/ceph-*"
