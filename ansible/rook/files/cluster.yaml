@@ -225,7 +225,7 @@ spec:
 #    mon:
 #    osd:
   storage: # cluster level storage configuration and selection
-    useAllNodes: false
+    useAllNodes: true
     useAllDevices: false
     deviceFilter: "vdb"
     location:
