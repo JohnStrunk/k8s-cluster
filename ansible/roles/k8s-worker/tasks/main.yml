@@ -7,11 +7,10 @@
 
 - name: Add feature gates to kubelet
   lineinfile:
-    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    path: /etc/sysconfig/kubelet
+    regexp: '^KUBELET_EXTRA_ARGS'
     line: >
-      Environment="KUBELET_EXTRA_ARGS=
-      --feature-gates={{ feature_gates|join(',') }}"
-    insertafter: "^Environment="
+      KUBELET_EXTRA_ARGS=--feature-gates={{ feature_gates|join(',') }}
     state: present
 
 - name: Restart kubelet
