@@ -3,4 +3,4 @@
 feature_gates:
   - "CustomResourceSubresources=true"
 k8s_init_token: "000000.1111111111111111"
-k8s_version: 1.13.0
+k8s_version: 1.13.5
