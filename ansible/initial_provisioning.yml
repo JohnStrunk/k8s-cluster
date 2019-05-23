@@ -6,27 +6,32 @@
 - hosts: all
   gather_facts: false
   become: true
+  any_errors_fatal: true
   tasks:
     - name: Install python
       raw: yum install -y python libselinux-python
 
 - hosts: all
   become: true
+  any_errors_fatal: true
   roles:
     - common
 
 - hosts: master
   become: true
+  any_errors_fatal: true
   roles:
     - k8s-master
 
 - hosts: workers
   become: true
+  any_errors_fatal: true
   roles:
     - k8s-worker
 
 - hosts: master
   become: false
+  any_errors_fatal: true
   tasks:
     - name: Retrieve kube config
       fetch:
@@ -47,6 +52,7 @@
 - hosts: localhost
   gather_facts: false
   become: false
+  any_errors_fatal: true
   vars:
     - kubeconfig: ../kubeconfig
   tasks:
