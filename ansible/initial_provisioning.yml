@@ -49,6 +49,10 @@
       changed_when: false
       with_items: "{{ groups['workers'] }}"
 
+    - name: Label workers with worker role
+      command: "kubectl label --overwrite no/{{ item }} node-role.kubernetes.io/worker=''"
+      with_items: "{{ groups['workers'] }}"
+
 - hosts: localhost
   gather_facts: false
   become: false
