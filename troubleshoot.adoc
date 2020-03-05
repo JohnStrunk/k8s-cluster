@@ -1,0 +1,24 @@
+= Troubleshooting Guide
+
+== Issue 1:
+Provider libvirt not found 
+[source, bash]
+----
+$ vagrant up                                                                                                                                                                                                   
+The provider 'libvirt' could not be found, but was requested to
+back the machine 'master'. Please use a provider that exists.
+                                                                                                                                                                                                                                              
+Vagrant knows about the following providers: docker, hyperv, virtualbox
+
+----
+
+== Solution:
+Make sure that we have ruby-dev or ruby-devel and then install libvirt plugin
+[source, bash]
+----
+$ yum install ruby-devel
+$ vagrant plugin install vagrant-libvirt
+$ vagrant plugin list 
+vagrant-libvirt (0.0.45, global)
+
+----

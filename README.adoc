@@ -28,3 +28,6 @@ parameters, instead of directly invoking `ansible-playbook`, use the included
 ----
 $ ./acmd ansible/upgrade_k8s_source.yml
 ----
+
+== Troubleshooting
+Checkout link:troubleshoot.adoc[troubleshooting guide]
