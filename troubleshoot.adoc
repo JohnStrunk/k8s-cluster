@@ -9,7 +9,6 @@ The provider 'libvirt' could not be found, but was requested to
 back the machine 'master'. Please use a provider that exists.
                                                                                                                                                                                                                                               
 Vagrant knows about the following providers: docker, hyperv, virtualbox
-
 ----
 
 == Solution:
@@ -20,5 +19,42 @@ $ yum install ruby-devel
 $ vagrant plugin install vagrant-libvirt
 $ vagrant plugin list 
 vagrant-libvirt (0.0.45, global)
+----
 
+== Issue 2:
+Invalid: sshfs
+[source, bash]
+----
+$ vagrant up
+Bringing machine 'master' up with 'libvirt' provider...
+Bringing machine 'worker0' up with 'libvirt' provider...
+Bringing machine 'worker1' up with 'libvirt' provider...
+Bringing machine 'worker2' up with 'libvirt' provider...
+==> worker2: Starting domain.
+==> worker0: Starting domain.
+==> worker1: Starting domain.
+...
+An error occurred while executing multiple actions in parallel.
+Any errors that occurred are shown below.
+
+An unexpected error occurred when executing the action on the
+'master' machine. Please report this as a bug:
+
+Internal error. Report this as a bug. Invalid: sshfs
+
+/usr/share/vagrant/gems/gems/vagrant-2.2.4/lib/vagrant/action/builtin/mixin_synced_folders.rb:137:in `block in synced_folders'
+/usr/share/vagrant/gems/gems/vagrant-2.2.4/lib/vagrant/action/builtin/mixin_synced_folders.rb:125:in `each'
+/usr/share/vagrant/gems/gems/vagrant-2.2.4/lib/vagrant/action/builtin/mixin_synced_folders.rb:125:in `synced_folders'
+/usr/share/vagrant/gems/gems/vagrant-2.2.4/lib/vagrant/action/builtin/synced_folder_cleanup.rb:19:in `call'
+/usr/share/vagrant/gems/gems/vagrant-2.2.4/lib/vagrant/action/warden.rb:50:in `call'
+...
+----
+
+== Solution:
+Vagrant attempting to use sshfs for the synced folder that is not a type of synced folder built into Vagrant. Install sshfs plugin
+[source, bash]
+----
+$ vagrant plugin install vagrant-sshfs
+$ vagrant plugin list | grep sshfs
+vagrant-sshfs (1.3.3, global)
 ----
