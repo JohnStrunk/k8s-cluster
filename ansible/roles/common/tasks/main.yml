@@ -10,6 +10,12 @@
     state: latest
   register: upgrade
 
+- name: Enable PasswordAuthentication in sshd_config
+  lineinfile:
+    name: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication no"
+    line: "PasswordAuthentication yes"
+
 - name: Reboot if packages were upgraded
   shell: sleep 2 && systemctl reboot
   async: 1
