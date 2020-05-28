@@ -20,6 +20,8 @@ Vagrant.configure("2") do |config|
     lv.volume_cache = "writeback"
     lv.video_type = "vga"
     lv.video_vram = "1024"
+    # Always use system connection instead of QEMU session
+    lv.qemu_use_session = false
   end
 
   # Can't write to /vagrant on atomic-host, so disable default sync dir
