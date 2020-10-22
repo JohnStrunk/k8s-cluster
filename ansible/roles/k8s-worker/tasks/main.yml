@@ -10,7 +10,7 @@
     path: /etc/sysconfig/kubelet
     regexp: '^KUBELET_EXTRA_ARGS'
     line: >
-      KUBELET_EXTRA_ARGS=--feature-gates={{ feature_gates|join(',') }}
+      KUBELET_EXTRA_ARGS=--feature-gates={{ feature_gates | default([]) | join(',') }}
     state: present
 
 - name: Restart kubelet
