@@ -13,7 +13,10 @@
 - name: Copy config to master
   template:
     src: config.yml
-    dest: /tmp/kubeadm_conf.yml
+    dest: /tmp/kubeadm_conf_old.yml
+
+- name: Convert old config to new
+  command: kubeadm config migrate --old-config /tmp/kubeadm_conf_old.yml --new-config /tmp/kubeadm_conf.yml
 
 - name: kubeadm init on master
   command: kubeadm init --config /tmp/kubeadm_conf.yml

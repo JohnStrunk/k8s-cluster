@@ -55,4 +55,6 @@ kind: JoinConfiguration
 discovery:
   bootstrapToken:
     token: "{{ k8s_init_token }}"
+    unsafeSkipCAVerification: true
+    apiServerEndpoint: master:6443
 #  tlsBootstrapToken: "{{ k8s_init_token }}"
